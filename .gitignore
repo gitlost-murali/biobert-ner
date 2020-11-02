@@ -1,5 +1,6 @@
 *.pt
 *.csv
+*.tsv
 *.json
 input/
 *.bin
