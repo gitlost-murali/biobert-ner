@@ -16,7 +16,15 @@ import engine
 from model import EntityModel
 
 
-def process_data(data_path):
+def process_data_conll(data_path):
+    """To read CONLL type data
+
+    Args:
+        data_path ([str]): File name
+
+    Returns:
+        Sentences, Sentence_wise_tags, Encoding Tags
+    """
     df = pd.read_csv(data_path, encoding="latin-1", sep="\t")
     sentences = []
     sent_tags = []
