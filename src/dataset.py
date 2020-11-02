@@ -3,9 +3,11 @@ import torch
 
 
 class EntityDataset:
-    def __init__(self, texts, tags):
+    def __init__(self, texts, tags, O_tag_id):
         # texts: [["hi", ",", "my", "name", "is", "abhishek"], ["hello".....]]
         # tags: [[1 2 3 4 1 5], [....].....]]
+        # O_tag_id: ID of the entity tag O. Needed for padding and CLS,SEP tokens
+        #           For padding, doesn't matter, since we don't attend but anyway.
         self.texts = texts
         self.tags = tags
     
@@ -32,8 +34,8 @@ class EntityDataset:
         ids = ids[:config.MAX_LEN - 2]
         target_tag = target_tag[:config.MAX_LEN - 2]
 
-        ids = [101] + ids + [102]
-        target_tag = [16] + target_tag + [16] #Change this. Should not be manual.
+        ids = [101] + ids + [102] #Should not be manual. Since these are BERT, it is fine. But still
+        target_tag = [O_tag_id] + target_tag + [O_tag_id] #Change this. Should not be manual for O.
 
         mask = [1] * len(ids)
         token_type_ids = [0] * len(ids)
@@ -43,7 +45,7 @@ class EntityDataset:
         ids = ids + ([0] * padding_len)
         mask = mask + ([0] * padding_len)
         token_type_ids = token_type_ids + ([0] * padding_len)
-        target_tag = target_tag + ([0] * padding_len)
+        target_tag = target_tag + ([0] * padding_len) #Is it 0? or O_tag_id
 
         return {
             "ids": torch.tensor(ids, dtype=torch.long),

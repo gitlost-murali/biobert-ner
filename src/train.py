@@ -56,7 +56,7 @@ def process_data_conll(data_path):
 
 
 if __name__ == "__main__":
-    sentences, tag, enc_tag = process_data(config.TRAINING_FILE)
+    sentences, tag, enc_tag = process_data_conll(config.TRAINING_FILE)
     
     meta_data = {
         "enc_tag": enc_tag
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     ) = model_selection.train_test_split(sentences, tag, random_state=42, test_size=0.1)
 
     train_dataset = dataset.EntityDataset(
-        texts=train_sentences, tags=train_tag
+        texts=train_sentences, tags=train_tag, O_tag_id= enc_tag.transform(["O"][0])
     )
 
     train_data_loader = torch.utils.data.DataLoader(
@@ -90,8 +90,8 @@ if __name__ == "__main__":
     )
     
     model = EntityModel(num_tag=num_tag)
-    device = torch.device("cuda")
-    # if torch.cuda.is_available(): model.to(device) #BioBERT is taking alot of space
+    device = torch.device("cuda" if config.CUDA else "cpu")
+    model.to(device) #BioBERT is taking alot of space
 
     param_optimizer = list(model.named_parameters())
     no_decay = ["bias", "LayerNorm.bias", "LayerNorm.weight"]
