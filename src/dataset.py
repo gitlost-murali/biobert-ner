@@ -10,7 +10,8 @@ class EntityDataset:
         #           For padding, doesn't matter, since we don't attend but anyway.
         self.texts = texts
         self.tags = tags
-    
+        self.O_tag_id = O_tag_id
+
     def __len__(self):
         return len(self.texts)
     
@@ -35,7 +36,7 @@ class EntityDataset:
         target_tag = target_tag[:config.MAX_LEN - 2]
 
         ids = [101] + ids + [102] #Should not be manual. Since these are BERT, it is fine. But still
-        target_tag = [O_tag_id] + target_tag + [O_tag_id] #Change this. Should not be manual for O.
+        target_tag = [self.O_tag_id] + target_tag + [self.O_tag_id] #Change this. Should not be manual for O.
 
         mask = [1] * len(ids)
         token_type_ids = [0] * len(ids)

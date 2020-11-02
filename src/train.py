@@ -74,7 +74,7 @@ if __name__ == "__main__":
     ) = model_selection.train_test_split(sentences, tag, random_state=42, test_size=0.1)
 
     train_dataset = dataset.EntityDataset(
-        texts=train_sentences, tags=train_tag, O_tag_id= enc_tag.transform(["O"][0])
+        texts=train_sentences, tags=train_tag, O_tag_id= enc_tag.transform(["O"])[0]
     )
 
     train_data_loader = torch.utils.data.DataLoader(
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     )
 
     valid_dataset = dataset.EntityDataset(
-        texts=test_sentences, tags=test_tag
+        texts=test_sentences, tags=test_tag, O_tag_id= enc_tag.transform(["O"])[0]
     )
 
     valid_data_loader = torch.utils.data.DataLoader(
