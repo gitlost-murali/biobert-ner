@@ -23,7 +23,8 @@ class EntityModel(nn.Module):
         self.bert = transformers.BertModel.from_pretrained(config.BASE_MODEL_PATH)
         self.bert_drop_1 = nn.Dropout(0.3)
         self.bert_drop_2 = nn.Dropout(0.3)
-        self.out_tag = nn.Linear(1024, self.num_tag) # 1024 for bio & 768 for BERT
+        self.out_tag = nn.Linear(config.BASE_MODEL_DIM, self.num_tag) 
+        # BASE_MODEL_DIM => 1024 for bio & 768 for BERT
         
     def forward(self, ids, mask, token_type_ids, target_tag):
         o1, _ = self.bert(ids, attention_mask=mask, token_type_ids=token_type_ids)
