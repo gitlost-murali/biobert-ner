@@ -13,8 +13,26 @@ from transformers import get_linear_schedule_with_warmup
 import config
 import dataset
 import engine
+import json
 from model import EntityModel
 
+def read_bilou(data_path):
+    with open(data_path,'r') as fh:
+        bilou_data = json.load(fh)
+    
+    sentences = []
+    sent_tags = []
+    sentences = [sent for sent,tags in bilou_data]
+    sent_tags = [tags for sent,tags in bilou_data]
+    enc_tag = preprocessing.LabelEncoder()
+    tags_list = []
+    for tags in sent_tags:
+        tags_list.extend(tags)
+ 
+    enc_tag.fit(tags_list)
+    sent_tags = [enc_tag.transform(tags) for tags in sent_tags]
+
+    return sentences, sent_tags, enc_tag
 
 def process_data_conll(data_path):
     """To read CONLL type data
@@ -56,7 +74,7 @@ def process_data_conll(data_path):
 
 
 if __name__ == "__main__":
-    sentences, tag, enc_tag = process_data_conll(config.TRAINING_FILE)
+    sentences, tag, enc_tag = read_bilou(config.TRAINING_FILE)
     
     meta_data = {
         "enc_tag": enc_tag

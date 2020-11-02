@@ -17,7 +17,7 @@ if __name__ == "__main__":
     num_tag = len(list(enc_tag.classes_))
 
     sentence = """
-    Murali lives in Mallapuram, India.
+    Strikes are happening across France .
     """
     tokenized_sentence = config.TOKENIZER.encode(sentence)
 
@@ -27,8 +27,8 @@ if __name__ == "__main__":
     print(config.TOKENIZER.convert_ids_to_tokens(tokenized_sentence))
 
     test_dataset = dataset.EntityDataset(
-        texts=[sentence], 
-        tags=[[0] * len(sentence)]
+        texts=[sentence],
+        tags=[[0] * len(sentence)], O_tag_id= enc_tag.transform(["O"])[0]
     )
 
     model = EntityModel(num_tag=num_tag)
