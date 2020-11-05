@@ -27,7 +27,7 @@ class EntityDataset:
                 s,
                 add_special_tokens=False
             )
-            # abhishek: ab ##hi ##sh ##ek
+            # Converting to BPE style. Antiestablishment => Anti ##establish ##ment 
             input_len = len(inputs)
             ids.extend(inputs)
             target_tag.extend([tags[i]] * input_len)
