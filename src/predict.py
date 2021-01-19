@@ -11,13 +11,13 @@ from model import EntityModel
 
 if __name__ == "__main__":
 
-    meta_data = joblib.load("meta.bin")
+    meta_data = joblib.load("demo_meta.bin")
     enc_tag = meta_data["enc_tag"]
 
     num_tag = len(list(enc_tag.classes_))
 
     sentence = """
-    Strikes are happening across France .
+    President Trump has addressed the nation on US supremacy over the world.
     """
     tokenized_sentence = config.TOKENIZER.encode(sentence)
 
