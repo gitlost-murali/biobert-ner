@@ -20,7 +20,7 @@ class EntityModel(nn.Module):
     def __init__(self, num_tag):
         super(EntityModel, self).__init__()
         self.num_tag = num_tag
-        self.bert = transformers.BertModel.from_pretrained(config.BASE_MODEL_PATH)
+        self.bert = transformers.AutoModel.from_pretrained(config.BASE_MODEL_PATH)
         self.bert_drop_1 = nn.Dropout(0.3)
         self.bert_drop_2 = nn.Dropout(0.3)
         self.out_tag = nn.Linear(config.BASE_MODEL_DIM, self.num_tag) 
