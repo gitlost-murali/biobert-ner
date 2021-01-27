@@ -37,6 +37,7 @@ class EntityDataset:
 
         ids = [101] + ids + [102] #Should not be manual. Since these are BERT, it is fine. But still
         target_tag = [self.O_tag_id] + target_tag + [self.O_tag_id] #Change this. Should not be manual for O.
+        seq_len = len(ids) 
 
         mask = [1] * len(ids)
         token_type_ids = [0] * len(ids)
@@ -53,5 +54,5 @@ class EntityDataset:
             "mask": torch.tensor(mask, dtype=torch.long),
             "token_type_ids": torch.tensor(token_type_ids, dtype=torch.long),
             "target_tag": torch.tensor(target_tag, dtype=torch.long),
-            "length": torch.tensor(len(text)),
+            "length": torch.tensor(seq_len),
         }
