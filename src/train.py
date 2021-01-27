@@ -74,8 +74,8 @@ def process_data_conll(data_path):
 
 
 if __name__ == "__main__":
-    sentences, tag, enc_tag = process_data_conll(config.TRAINING_FILE)
-    
+    sentences, tag, enc_tag = read_bilou(config.TRAINING_FILE)
+
     meta_data = {
         "enc_tag": enc_tag
     }
@@ -137,8 +137,7 @@ if __name__ == "__main__":
     best_loss = np.inf
     for epoch in range(config.EPOCHS):
         train_loss = engine.train_fn(train_data_loader, model, optimizer, device, scheduler)
-        test_loss = engine.eval_fn(valid_data_loader, model, device)
-        metrics = engine.eval_with_metrics(valid_data_loader, model, device, enc_tag)
+        test_loss, metrics = engine.eval_with_metrics_combined(valid_data_loader, model, device, enc_tag)
         print(f"Train Loss = {train_loss} Valid Loss = {test_loss}, Metrics = {metrics}")
         if test_loss < best_loss:
             torch.save(model.state_dict(), config.MODEL_PATH)
