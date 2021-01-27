@@ -49,6 +49,8 @@ def eval_with_metrics(data_loader, model, device, enc_tag):
             ground_truth = enc_tag.inverse_transform(ground_truth_seq)
             y_ground.extend(ground_truth)
 
-    metrics = classification_report(y_pred=y_pred, y_true=y_ground, labels=enc_tag.classes_)
+    class_labels = (enc_tag.classes_).tolist()
+    class_labels.remove("O")
+    metrics = classification_report(y_pred=y_pred, y_true=y_ground, labels= class_labels)
 
     return metrics
