@@ -1,0 +1,12 @@
+{"MAX_LEN" : 128,
+"TRAIN_BATCH_SIZE" : 12,
+"VALID_BATCH_SIZE" : 4,
+"VALIDATION_SPLIT" : 0.2,
+"EPOCHS" : 10,
+"CUDA" : true,
+"BASE_MODEL_PATH" : "../input/ixambert-base-cased",
+"language": "en_ner",
+"MODEL_PATH" : "model.bin",
+"BASE_MODEL_DIM" : 768,
+"TRAINING_FILE" : "../../../datasets/experiment_data_en/english_protein_chemical.json",
+"RANDOM_STATE" : 42}
