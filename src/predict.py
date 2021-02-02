@@ -19,12 +19,12 @@ if __name__ == "__main__":
     sentence = """
     President Trump has addressed the nation on US supremacy over the world.
     """
-    tokenized_sentence = config.TOKENIZER.encode(sentence)
+    tokenized_sentence = config.params["TOKENIZER"].encode(sentence)
 
     sentence = sentence.split()
     print(sentence)
     print(tokenized_sentence)
-    print(config.TOKENIZER.convert_ids_to_tokens(tokenized_sentence))
+    print(config.params["TOKENIZER"].convert_ids_to_tokens(tokenized_sentence))
 
     test_dataset = dataset.EntityDataset(
         texts=[sentence],
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     )
 
     model = EntityModel(num_tag=num_tag)
-    model.load_state_dict(torch.load(config.MODEL_PATH))
+    model.load_state_dict(torch.load(config.params["MODEL_PATH"]))
     device = torch.device("cuda")
     if torch.cuda.is_available(): model.to(device)
 

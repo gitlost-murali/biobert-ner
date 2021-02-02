@@ -32,8 +32,8 @@ class EntityDataset:
             ids.extend(inputs)
             target_tag.extend([tags[i]] * input_len)
 
-        ids = ids[:config.MAX_LEN - 2]
-        target_tag = target_tag[:config.MAX_LEN - 2]
+        ids = ids[:config.params["MAX_LEN"] - 2]
+        target_tag = target_tag[:config.params["MAX_LEN"] - 2]
 
         ids = [101] + ids + [102] #Should not be manual. Since these are BERT, it is fine. But still
         target_tag = [self.O_tag_id] + target_tag + [self.O_tag_id] #Change this. Should not be manual for O.
@@ -42,7 +42,7 @@ class EntityDataset:
         mask = [1] * len(ids)
         token_type_ids = [0] * len(ids)
 
-        padding_len = config.MAX_LEN - len(ids)
+        padding_len = config.params["MAX_LEN"] - len(ids)
 
         ids = ids + ([0] * padding_len)
         mask = mask + ([0] * padding_len)

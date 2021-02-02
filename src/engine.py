@@ -152,7 +152,7 @@ def eval_with_metrics_combined(data_loader, model, device, enc_tag):
 
     class_labels = copy.deepcopy(enc_tag.classes_).tolist()
     class_labels.remove("O")
-    metrics = classification_report(y_pred=y_pred, y_true=y_ground, labels= class_labels)
+    metrics = classification_report(y_pred=y_pred, y_true=y_ground, labels= class_labels, output_dict=True)
     val_loss = final_loss / len(data_loader)
 
     return val_loss, metrics

@@ -16,6 +16,10 @@ import engine
 import json
 from model import EntityModel
 
+import wandb
+# 1. Start a new run
+wandb.init(project=config.params["language"],config=config.params)
+
 def read_bilou(data_path):
     with open(data_path,'r') as fh:
         bilou_data = json.load(fh)
@@ -74,7 +78,7 @@ def process_data_conll(data_path):
 
 
 if __name__ == "__main__":
-    sentences, tag, enc_tag = read_bilou(config.TRAINING_FILE)
+    sentences, tag, enc_tag = read_bilou(config.params["TRAINING_FILE"])
 
     meta_data = {
         "enc_tag": enc_tag
@@ -89,14 +93,14 @@ if __name__ == "__main__":
         test_sentences,
         train_tag,
         test_tag
-    ) = model_selection.train_test_split(sentences, tag, random_state=config.RANDOM_STATE, test_size=0.1)
+    ) = model_selection.train_test_split(sentences, tag, random_state=config.params["RANDOM_STATE"], test_size=config.params["VALIDATION_SPLIT"])
 
     train_dataset = dataset.EntityDataset(
         texts=train_sentences, tags=train_tag, O_tag_id= enc_tag.transform(["O"])[0]
     )
 
     train_data_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=config.TRAIN_BATCH_SIZE, num_workers=4
+        train_dataset, batch_size=config.params["TRAIN_BATCH_SIZE"], num_workers=4
     )
 
     valid_dataset = dataset.EntityDataset(
@@ -104,11 +108,11 @@ if __name__ == "__main__":
     )
 
     valid_data_loader = torch.utils.data.DataLoader(
-        valid_dataset, batch_size=config.VALID_BATCH_SIZE, num_workers=1
+        valid_dataset, batch_size=config.params["VALID_BATCH_SIZE"], num_workers=1
     )
     
     model = EntityModel(num_tag=num_tag)
-    device = torch.device("cuda" if config.CUDA else "cpu")
+    device = torch.device("cuda" if config.params["CUDA"] else "cpu")
     model.to(device) #BioBERT is taking alot of space
 
     param_optimizer = list(model.named_parameters())
@@ -128,17 +132,32 @@ if __name__ == "__main__":
         },
     ]
 
-    num_train_steps = int(len(train_sentences) / config.TRAIN_BATCH_SIZE * config.EPOCHS)
+    num_train_steps = int(len(train_sentences) / config.params["TRAIN_BATCH_SIZE"] * config.params["EPOCHS"])
     optimizer = AdamW(optimizer_parameters, lr=3e-5)
     scheduler = get_linear_schedule_with_warmup(
         optimizer, num_warmup_steps=0, num_training_steps=num_train_steps
     )
 
     best_loss = np.inf
-    for epoch in range(config.EPOCHS):
+    for epoch in range(config.params["EPOCHS"]):
         train_loss = engine.train_fn(train_data_loader, model, optimizer, device, scheduler)
         test_loss, metrics = engine.eval_with_metrics_combined(valid_data_loader, model, device, enc_tag)
-        print(f"Train Loss = {train_loss} Valid Loss = {test_loss}, Metrics = {metrics}")
+
+        df_metrics = pd.DataFrame.from_dict(metrics)
+        df_metrics = df_metrics.transpose()
+
+        weighted_average = df_metrics["f1-score"][-1]
+        micro_average = df_metrics["f1-score"][-3]
+
+        table = wandb.Table(dataframe=df_metrics.transpose())
+        wandb.log({"Train loss":train_loss, "Valid loss": test_loss})
+        wandb.log({"Validation Metric details": table})
+        wandb.log({"Weighted average": weighted_average, "Micro average": micro_average})
+
+        print(f"Train Loss = {train_loss} Valid Loss = {test_loss}, Metrics = {df_metrics}")
         if test_loss < best_loss:
-            torch.save(model.state_dict(), config.MODEL_PATH)
+            torch.save(model.state_dict(), config.params["MODEL_PATH"])
+            model.save_pretrained_model(config.params["BASE_MODEL_PATH"]+"_finetuned_"+config.params["language"])
+            config.TOKENIZER.save_pretrained(config.params["BASE_MODEL_PATH"]+"_finetuned_"+config.params["language"])
             best_loss = test_loss
+            wandb.run.summary["best_valloss"] = best_loss

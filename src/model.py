@@ -20,12 +20,15 @@ class EntityModel(nn.Module):
     def __init__(self, num_tag):
         super(EntityModel, self).__init__()
         self.num_tag = num_tag
-        self.bert = transformers.AutoModel.from_pretrained(config.BASE_MODEL_PATH)
+        self.bert = transformers.AutoModel.from_pretrained(config.params['BASE_MODEL_PATH'])
         self.bert_drop_1 = nn.Dropout(0.3)
         self.bert_drop_2 = nn.Dropout(0.3)
-        self.out_tag = nn.Linear(config.BASE_MODEL_DIM, self.num_tag) 
+        self.out_tag = nn.Linear(config.params['BASE_MODEL_DIM'], self.num_tag) 
         # BASE_MODEL_DIM => 1024 for bio & 768 for BERT
-        
+
+    def save_pretrained_model(self, new_model_path):
+        self.bert.save_pretrained(new_model_path)
+
     def forward(self, ids, mask, token_type_ids, target_tag):
         o1, _ = self.bert(ids, attention_mask=mask, token_type_ids=token_type_ids)
 
