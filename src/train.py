@@ -78,7 +78,8 @@ def process_data_conll(data_path):
 
 
 if __name__ == "__main__":
-    sentences, tag, enc_tag = read_bilou(config.params["TRAINING_FILE"])
+    train_sentences, train_tag, enc_tag = read_bilou(config.params["TRAINING_FILE"])
+    test_sentences, test_tag, _ = read_bilou(config.params["VALIDATION_FILE"])
 
     meta_data = {
         "enc_tag": enc_tag
@@ -87,13 +88,6 @@ if __name__ == "__main__":
     joblib.dump(meta_data, "meta.bin")
 
     num_tag = len(list(enc_tag.classes_))
-
-    (
-        train_sentences,
-        test_sentences,
-        train_tag,
-        test_tag
-    ) = model_selection.train_test_split(sentences, tag, random_state=config.params["RANDOM_STATE"], test_size=config.params["VALIDATION_SPLIT"])
 
     train_dataset = dataset.EntityDataset(
         texts=train_sentences, tags=train_tag, O_tag_id= enc_tag.transform(["O"])[0]
